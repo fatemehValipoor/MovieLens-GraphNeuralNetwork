@@ -2,6 +2,7 @@ import sys
 import os
 import torch
 from torch_geometric.data import Data
+from models.GCN import GCN
 
 # اضافه کردن مسیر src به sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
@@ -19,9 +20,13 @@ def main():
     print(f"Number of edges: {data.num_edges}")
     print(f"Shape of node features: {data.x.shape}")
     print(f"Edge index shape: {data.edge_index.shape}")
-    print(f"Labels shape: {data.y.shape}")
-    print(f"Sample edge_index:\n{data.edge_index[:, :5]}")  # نمایش چند یال نمونه
-    print(f"Sample labels:\n{data.y[:5]}")  # نمایش چند برچسب نمونه
+         # ویژگی‌های ورودی نودها: 2 (user/movie one-hot)
+    model = GCN(in_channels=2, hidden_channels=16, out_channels=8)
+
+    out = model(data.x, data.edge_index)  # embedding نهایی هر نود
+
+    print("Node embeddings shape:", out.shape)
+    print(out)
 
 if __name__ == "__main__":
     main()

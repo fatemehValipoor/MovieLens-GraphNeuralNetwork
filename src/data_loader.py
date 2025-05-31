@@ -25,8 +25,11 @@ def build_graph(users, movies, ratings):
 
     # تعداد نودها
     num_users = len(user_id_map)
+    print(f"num_users: {num_users}")
     num_movies = len(movie_id_map)
+    print(f"num_movies: {num_movies}")
     num_nodes = num_users + num_movies
+    print(f"num_nodes: {num_nodes}")
 
     # ساخت edge_index
     edge_list = []
@@ -38,19 +41,16 @@ def build_graph(users, movies, ratings):
 
     edge_index = torch.tensor(edge_list, dtype=torch.long).t().contiguous()
 
-    # ویژگی‌های ساده: one-hot برای نوع نود (کاربر/فیلم)
-    x = torch.zeros((num_nodes, 2))  # 2 ویژگی: user=1, movie=1
+    # Simple node features: one-hot for type (user/movie)
+    x = torch.zeros((num_nodes, 2))
     x[:num_users, 0] = 1  # users
     x[num_users:, 1] = 1  # movies
 
-    # برچسب (مثلاً rating > 3 → like)
-    y = []
-    for _, row in ratings.iterrows():
-        y.append(1 if row['rating'] >= 4 else 0)
-
-    y = torch.tensor(y, dtype=torch.long)
-
-    data = Data(x=x, edge_index=edge_index, y=y)
+    data = Data(x=x, edge_index=edge_index)
+    data.num_users = num_users  # optionally helpful later
+    data.num_movies = num_movies
+    data.user_id_map = user_id_map
+    data.movie_id_map = movie_id_map
     return data
 
 def get_graph(data_dir):
